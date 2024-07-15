@@ -1,0 +1,33 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "af5-chat-app",
+          "appId": "1:541345764871:android:8baba0759e035117c47ca2",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "af5-chat-app",
+          "configurations": {
+            "android": "1:541345764871:android:8baba0759e035117c47ca2",
+            "ios": "1:541345764871:ios:53b67d7ade6099bfc47ca2",
+            "macos": "1:541345764871:ios:53b67d7ade6099bfc47ca2",
+            "web": "1:541345764871:web:6e7b5537bb6a7263c47ca2",
+            "windows": "1:541345764871:web:6a84b99175377282c47ca2"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
