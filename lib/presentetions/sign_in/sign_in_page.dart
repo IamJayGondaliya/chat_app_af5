@@ -1,5 +1,6 @@
 import 'package:chat_app_af5/extensions.dart';
 import 'package:chat_app_af5/services/auth_services.dart';
+import 'package:chat_app_af5/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -47,6 +48,8 @@ class SignInPage extends StatelessWidget {
                       );
 
                       if (user != null) {
+                        await FireStoreService.instance.addUser(user: user);
+                        await FireStoreService.instance.getUser();
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text("REGISTERED !!"),
@@ -66,6 +69,7 @@ class SignInPage extends StatelessWidget {
                       );
 
                       if (user != null) {
+                        await FireStoreService.instance.getUser();
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text("SIGN UP !!"),
@@ -97,6 +101,8 @@ class SignInPage extends StatelessWidget {
                   User? user = credential.user;
 
                   if (user != null) {
+                    await FireStoreService.instance.addUser(user: user);
+                    await FireStoreService.instance.getUser();
                     Navigator.of(context).pushReplacementNamed('home_page');
                   }
                 },

@@ -10,6 +10,22 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+        child: Column(
+          children: [
+            UserAccountsDrawerHeader(
+              currentAccountPicture: CircleAvatar(
+                foregroundImage: NetworkImage(
+                  FireStoreService.instance.currentUser.photoURL,
+                ),
+              ),
+              accountName:
+                  Text(FireStoreService.instance.currentUser.displayName),
+              accountEmail: Text(FireStoreService.instance.currentUser.email),
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         title: Text(
           AuthService.instance.auth.currentUser?.displayName ?? "No User",
@@ -71,8 +87,8 @@ class HomePage extends StatelessWidget {
         onPressed: () {
           FireStoreService.instance.addTodo(
             todoModel: TodoModel(
-              "105",
-              "Again Data",
+              "101",
+              "Demo User TODO",
               false,
               15126532,
             ),

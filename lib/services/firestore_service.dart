@@ -1,14 +1,45 @@
 import 'package:chat_app_af5/models/todo_model.dart';
+import 'package:chat_app_af5/models/user_model.dart';
+import 'package:chat_app_af5/services/auth_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FireStoreService {
-  FireStoreService._();
+  FireStoreService._() {
+    getUser();
+  }
   static final FireStoreService instance = FireStoreService._();
 
   // Initialize
   FirebaseFirestore fireStore = FirebaseFirestore.instance;
 
   String collectionPath = "Todo";
+  String userCollection = "allUsers";
+
+  late UserModel currentUser;
+
+  // Add user
+  Future<void> addUser({required User user}) async {
+    Map<String, dynamic> data = {
+      'uid': user.uid,
+      'displayName': user.displayName ?? "DEMO USER",
+      'email': user.email ?? "demo_mail",
+      'phoneNumber': user.phoneNumber ?? "NO DATA",
+      'photoURL': user.photoURL ??
+          "https://static.vecteezy.com/system/resources/previews/002/318/271/non_2x/user-profile-icon-free-vector.jpg",
+    };
+
+    await fireStore.collection(userCollection).doc(user.uid).set(data);
+  }
+
+  Future<void> getUser() async {
+    DocumentSnapshot snapshot = await fireStore
+        .collection(userCollection)
+        .doc(AuthService.instance.auth.currentUser!.uid)
+        .get();
+
+    currentUser = UserModel.froMap(snapshot.data() as Map);
+  }
 
   // Add data
   Future<void> addTodo({required TodoModel todoModel}) async {
@@ -18,7 +49,12 @@ class FireStoreService {
     //     );
 
     // Custom ID
-    await fireStore.collection(collectionPath).doc(todoModel.id).set(
+    await fireStore
+        .collection(userCollection)
+        .doc(currentUser.uid)
+        .collection(collectionPath)
+        .doc(todoModel.id)
+        .set(
           todoModel.toMap,
         );
   }
@@ -27,8 +63,11 @@ class FireStoreService {
     List<TodoModel> allTodos = [];
 
     // Get snapShots
-    QuerySnapshot<Map<String, dynamic>> snapshot =
-        await fireStore.collection(collectionPath).get();
+    QuerySnapshot<Map<String, dynamic>> snapshot = await fireStore
+        .collection(userCollection)
+        .doc(currentUser.uid)
+        .collection(collectionPath)
+        .get();
 
     // Get Docs
     List<QueryDocumentSnapshot> docs = snapshot.docs;
@@ -45,12 +84,18 @@ class FireStoreService {
 
   // Data stream
   Stream<QuerySnapshot<Map<String, dynamic>>> getStream() {
-    return fireStore.collection(collectionPath).snapshots();
+    return fireStore
+        .collection(userCollection)
+        .doc(currentUser.uid)
+        .collection(collectionPath)
+        .snapshots();
   }
 
   // Data Update
   Future<void> updateStatus({required TodoModel todoModel}) async {
     await fireStore
+        .collection(userCollection)
+        .doc(currentUser.uid)
         .collection(collectionPath)
         .doc(todoModel.id)
         .update(todoModel.toMap);
