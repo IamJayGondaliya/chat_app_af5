@@ -23,6 +23,16 @@ class HomePage extends StatelessWidget {
                   Text(FireStoreService.instance.currentUser.displayName),
               accountEmail: Text(FireStoreService.instance.currentUser.email),
             ),
+            ListTile(
+              leading: const Icon(Icons.people),
+              title: const Text("My friends"),
+              trailing: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed('friends');
+                },
+                icon: const Icon(Icons.arrow_forward_ios),
+              ),
+            ),
           ],
         ),
       ),
@@ -31,6 +41,12 @@ class HomePage extends StatelessWidget {
           AuthService.instance.auth.currentUser?.displayName ?? "No User",
         ),
         actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed('all_users');
+            },
+            icon: const Icon(Icons.people),
+          ),
           IconButton(
             onPressed: () {
               AuthService.instance.logOut().then((value) {

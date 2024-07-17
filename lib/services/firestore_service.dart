@@ -3,6 +3,7 @@ import 'package:chat_app_af5/models/user_model.dart';
 import 'package:chat_app_af5/services/auth_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:logger/web.dart';
 
 class FireStoreService {
   FireStoreService._() {
@@ -99,5 +100,45 @@ class FireStoreService {
         .collection(collectionPath)
         .doc(todoModel.id)
         .update(todoModel.toMap);
+  }
+
+  // Get all users
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsers() {
+    return fireStore.collection(userCollection).snapshots();
+  }
+
+  // Add friend
+  Future<void> addFriend({required UserModel userModel}) async {
+    await fireStore
+        .collection(userCollection)
+        .doc(currentUser.uid)
+        .collection('friends')
+        .doc(userModel.uid)
+        .set(userModel.toMap)
+        .then((value) => Logger().i("Added...."))
+        .onError((error, stackTrace) => Logger().e("ERROR: ${error}"));
+  }
+
+  Future<List<UserModel>> getFriends() async {
+    List<UserModel> friends = [];
+
+    friends = (await fireStore
+            .collection(userCollection)
+            .doc(currentUser.uid)
+            .collection('friends')
+            .get())
+        .docs
+        .map((e) => UserModel.froMap(e.data()))
+        .toList();
+
+    return friends;
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getFriendsStream() {
+    return fireStore
+        .collection(userCollection)
+        .doc(currentUser.uid)
+        .collection('friends')
+        .snapshots();
   }
 }
