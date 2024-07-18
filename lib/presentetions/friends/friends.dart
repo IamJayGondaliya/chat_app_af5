@@ -32,10 +32,17 @@ class MyFriends extends StatelessWidget {
                         UserModel userModel = friends[i];
 
                         return ListTile(
+                          onTap: () {
+                            Navigator.of(context).pushNamed(
+                              'chat_page',
+                              arguments: userModel,
+                            );
+                          },
                           leading: CircleAvatar(
                             foregroundImage: NetworkImage(userModel.photoURL),
                           ),
                           title: Text(userModel.displayName),
+                          subtitle: Text(userModel.email),
                         );
                       },
                     );

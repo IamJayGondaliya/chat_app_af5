@@ -1,3 +1,4 @@
+import 'package:chat_app_af5/models/chat_model.dart';
 import 'package:chat_app_af5/models/todo_model.dart';
 import 'package:chat_app_af5/models/user_model.dart';
 import 'package:chat_app_af5/services/auth_services.dart';
@@ -117,6 +118,13 @@ class FireStoreService {
         .set(userModel.toMap)
         .then((value) => Logger().i("Added...."))
         .onError((error, stackTrace) => Logger().e("ERROR: ${error}"));
+
+    await fireStore
+        .collection(userCollection)
+        .doc(userModel.uid)
+        .collection('friends')
+        .doc(currentUser.uid)
+        .set(currentUser.toMap);
   }
 
   Future<List<UserModel>> getFriends() async {
@@ -140,5 +148,40 @@ class FireStoreService {
         .doc(currentUser.uid)
         .collection('friends')
         .snapshots();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getChats(
+      {required UserModel userModel}) {
+    return fireStore
+        .collection(userCollection)
+        .doc(currentUser.uid)
+        .collection('friends')
+        .doc(userModel.uid)
+        .collection('chats')
+        .snapshots();
+  }
+
+  Future<void> sendMsg(
+      {required UserModel user, required ChatModel chat}) async {
+    await fireStore
+        .collection(userCollection)
+        .doc(currentUser.uid)
+        .collection('friends')
+        .doc(user.uid)
+        .collection('chats')
+        .doc(chat.time.millisecondsSinceEpoch.toString())
+        .set(chat.toMap);
+
+    Map<String, dynamic> data = user.toMap;
+    data['type'] = 'received';
+
+    await fireStore
+        .collection(userCollection)
+        .doc(user.uid)
+        .collection('friends')
+        .doc(currentUser.uid)
+        .collection('chats')
+        .doc(chat.time.millisecondsSinceEpoch.toString())
+        .set(data);
   }
 }

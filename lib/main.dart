@@ -1,5 +1,6 @@
 import 'package:chat_app_af5/firebase_options.dart';
 import 'package:chat_app_af5/presentetions/all_users/all_users.dart';
+import 'package:chat_app_af5/presentetions/chat_page/chat_page.dart';
 import 'package:chat_app_af5/presentetions/friends/friends.dart';
 import 'package:chat_app_af5/presentetions/home_page/home_page.dart';
 import 'package:chat_app_af5/presentetions/sign_in/sign_in_page.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
         'home_page': (context) => const HomePage(),
         'all_users': (context) => const AllUsersPage(),
         'friends': (context) => const MyFriends(),
+        'chat_page': (context) => ChatPage(),
       },
     );
   }
