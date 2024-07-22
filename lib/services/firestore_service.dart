@@ -7,9 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/web.dart';
 
 class FireStoreService {
-  FireStoreService._() {
-    getUser();
-  }
+  FireStoreService._();
   static final FireStoreService instance = FireStoreService._();
 
   // Initialize
@@ -18,7 +16,7 @@ class FireStoreService {
   String collectionPath = "Todo";
   String userCollection = "allUsers";
 
-  late UserModel currentUser;
+  UserModel? currentUser;
 
   // Add user
   Future<void> addUser({required User user}) async {
@@ -53,7 +51,7 @@ class FireStoreService {
     // Custom ID
     await fireStore
         .collection(userCollection)
-        .doc(currentUser.uid)
+        .doc(currentUser!.uid)
         .collection(collectionPath)
         .doc(todoModel.id)
         .set(
@@ -67,7 +65,7 @@ class FireStoreService {
     // Get snapShots
     QuerySnapshot<Map<String, dynamic>> snapshot = await fireStore
         .collection(userCollection)
-        .doc(currentUser.uid)
+        .doc(currentUser!.uid)
         .collection(collectionPath)
         .get();
 
@@ -88,7 +86,7 @@ class FireStoreService {
   Stream<QuerySnapshot<Map<String, dynamic>>> getStream() {
     return fireStore
         .collection(userCollection)
-        .doc(currentUser.uid)
+        .doc(currentUser!.uid)
         .collection(collectionPath)
         .snapshots();
   }
@@ -97,7 +95,7 @@ class FireStoreService {
   Future<void> updateStatus({required TodoModel todoModel}) async {
     await fireStore
         .collection(userCollection)
-        .doc(currentUser.uid)
+        .doc(currentUser!.uid)
         .collection(collectionPath)
         .doc(todoModel.id)
         .update(todoModel.toMap);
@@ -112,7 +110,7 @@ class FireStoreService {
   Future<void> addFriend({required UserModel userModel}) async {
     await fireStore
         .collection(userCollection)
-        .doc(currentUser.uid)
+        .doc(currentUser!.uid)
         .collection('friends')
         .doc(userModel.uid)
         .set(userModel.toMap)
@@ -123,8 +121,8 @@ class FireStoreService {
         .collection(userCollection)
         .doc(userModel.uid)
         .collection('friends')
-        .doc(currentUser.uid)
-        .set(currentUser.toMap);
+        .doc(currentUser!.uid)
+        .set(currentUser!.toMap);
   }
 
   Future<List<UserModel>> getFriends() async {
@@ -132,7 +130,7 @@ class FireStoreService {
 
     friends = (await fireStore
             .collection(userCollection)
-            .doc(currentUser.uid)
+            .doc(currentUser!.uid)
             .collection('friends')
             .get())
         .docs
@@ -145,7 +143,7 @@ class FireStoreService {
   Stream<QuerySnapshot<Map<String, dynamic>>> getFriendsStream() {
     return fireStore
         .collection(userCollection)
-        .doc(currentUser.uid)
+        .doc(currentUser!.uid)
         .collection('friends')
         .snapshots();
   }
@@ -154,7 +152,7 @@ class FireStoreService {
       {required UserModel userModel}) {
     return fireStore
         .collection(userCollection)
-        .doc(currentUser.uid)
+        .doc(currentUser!.uid)
         .collection('friends')
         .doc(userModel.uid)
         .collection('chats')
@@ -165,23 +163,48 @@ class FireStoreService {
       {required UserModel user, required ChatModel chat}) async {
     await fireStore
         .collection(userCollection)
-        .doc(currentUser.uid)
+        .doc(currentUser!.uid)
         .collection('friends')
         .doc(user.uid)
         .collection('chats')
         .doc(chat.time.millisecondsSinceEpoch.toString())
         .set(chat.toMap);
 
-    Map<String, dynamic> data = user.toMap;
+    Map<String, dynamic> data = chat.toMap;
     data['type'] = 'received';
 
     await fireStore
         .collection(userCollection)
         .doc(user.uid)
         .collection('friends')
-        .doc(currentUser.uid)
+        .doc(currentUser!.uid)
         .collection('chats')
         .doc(chat.time.millisecondsSinceEpoch.toString())
         .set(data);
+  }
+
+  Future<void> seenMsg(
+      {required UserModel user, required ChatModel chat}) async {
+    await fireStore
+        .collection(userCollection)
+        .doc(currentUser!.uid.toString())
+        .collection('friends')
+        .doc(user.uid.toString())
+        .collection('chats')
+        .doc(chat.time.millisecondsSinceEpoch.toString())
+        .update(
+      {'status': "seen"},
+    );
+
+    await fireStore
+        .collection(userCollection)
+        .doc(user.uid.toString())
+        .collection('friends')
+        .doc(currentUser!.uid.toString())
+        .collection('chats')
+        .doc(chat.time.millisecondsSinceEpoch.toString())
+        .update(
+      {'status': "seen"},
+    );
   }
 }

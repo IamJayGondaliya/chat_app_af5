@@ -4,6 +4,7 @@ import 'package:chat_app_af5/presentetions/chat_page/chat_page.dart';
 import 'package:chat_app_af5/presentetions/friends/friends.dart';
 import 'package:chat_app_af5/presentetions/home_page/home_page.dart';
 import 'package:chat_app_af5/presentetions/sign_in/sign_in_page.dart';
+import 'package:chat_app_af5/services/firestore_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +13,8 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // await FireStoreService.instance.getUser();
 
   runApp(
     const MyApp(),
@@ -25,6 +28,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      initialRoute:
+          FireStoreService.instance.currentUser == null ? '/' : 'home_page',
       routes: {
         '/': (context) => const SignInPage(),
         'home_page': (context) => const HomePage(),

@@ -43,6 +43,13 @@ class ChatPage extends StatelessWidget {
                       itemBuilder: (c, i) {
                         ChatModel chat = chats[i];
 
+                        if (chat.type == 'received') {
+                          FireStoreService.instance.seenMsg(
+                            user: userModel,
+                            chat: chat,
+                          );
+                        }
+
                         return Row(
                           mainAxisAlignment: chat.type == "sent"
                               ? MainAxisAlignment.end
@@ -55,12 +62,24 @@ class ChatPage extends StatelessWidget {
                               ),
                               child: Container(
                                 padding: const EdgeInsets.all(5),
+                                margin: const EdgeInsets.only(
+                                  bottom: 5,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   border: Border.all(),
                                   borderRadius: BorderRadius.circular(5),
                                 ),
-                                child: Text(chat.msg),
+                                child: Text(
+                                  chat.msg,
+                                  style: TextStyle(
+                                    color: chat.type == 'sent'
+                                        ? chat.status == 'seen'
+                                            ? Colors.blue
+                                            : null
+                                        : null,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
@@ -78,15 +97,19 @@ class ChatPage extends StatelessWidget {
             TextField(
               controller: controller,
               onSubmitted: (val) {
-                FireStoreService.instance.sendMsg(
-                  user: userModel,
-                  chat: ChatModel(
-                    DateTime.now(),
-                    controller.text,
-                    'sent',
-                    'unseen',
-                  ),
-                );
+                FireStoreService.instance
+                    .sendMsg(
+                      user: userModel,
+                      chat: ChatModel(
+                        DateTime.now(),
+                        controller.text,
+                        'sent',
+                        'unseen',
+                      ),
+                    )
+                    .then(
+                      (value) => controller.clear(),
+                    );
               },
             ),
           ],

@@ -22,7 +22,9 @@ class UserModel {
       );
 
   Future<void> load() async {
-    friends = await FireStoreService.instance.getFriends();
+    if (uid == FireStoreService.instance.currentUser!.uid) {
+      friends = await FireStoreService.instance.getFriends();
+    }
   }
 
   Map<String, dynamic> get toMap => {
