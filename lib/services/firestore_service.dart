@@ -207,4 +207,48 @@ class FireStoreService {
       {'status': "seen"},
     );
   }
+
+  Future<void> updateMsg(UserModel userModel, ChatModel chat) async {
+    await fireStore
+        .collection(userCollection)
+        .doc(currentUser!.uid.toString())
+        .collection('friends')
+        .doc(userModel.uid.toString())
+        .collection('chats')
+        .doc(chat.time.millisecondsSinceEpoch.toString())
+        .update(
+      {'msg': chat.msg},
+    );
+
+    await fireStore
+        .collection(userCollection)
+        .doc(userModel.uid.toString())
+        .collection('friends')
+        .doc(currentUser!.uid.toString())
+        .collection('chats')
+        .doc(chat.time.millisecondsSinceEpoch.toString())
+        .update(
+      {'msg': chat.msg},
+    );
+  }
+
+  Future<void> deleteMsg(UserModel userModel, ChatModel chat) async {
+    await fireStore
+        .collection(userCollection)
+        .doc(currentUser!.uid.toString())
+        .collection('friends')
+        .doc(userModel.uid.toString())
+        .collection('chats')
+        .doc(chat.time.millisecondsSinceEpoch.toString())
+        .delete();
+
+    await fireStore
+        .collection(userCollection)
+        .doc(userModel.uid.toString())
+        .collection('friends')
+        .doc(currentUser!.uid.toString())
+        .collection('chats')
+        .doc(chat.time.millisecondsSinceEpoch.toString())
+        .delete();
+  }
 }

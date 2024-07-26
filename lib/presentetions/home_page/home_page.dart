@@ -1,11 +1,48 @@
 import 'package:chat_app_af5/models/todo_model.dart';
 import 'package:chat_app_af5/services/auth_services.dart';
 import 'package:chat_app_af5/services/firestore_service.dart';
+import 'package:chat_app_af5/services/notification_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:logger/logger.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  late final AppLifecycleListener _listener;
+  // late AppLifecycleState _state;
+
+  @override
+  void initState() {
+    // _state = SchedulerBinding.instance.lifecycleState!;
+    // Logger().i("STATE: ${_state.name}");
+
+    _listener = AppLifecycleListener(
+      onResume: () {
+        Logger().i("USER ENTERED...");
+      },
+      onPause: () {
+        Logger().i("USER EXITED...");
+      },
+    );
+
+    NotificationServices.instance.request();
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _listener.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +93,19 @@ class HomePage extends StatelessWidget {
             icon: const Icon(Icons.logout),
           ),
         ],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                NotificationServices.instance.simpleNotification();
+              },
+              child: const Text("Simple Notification"),
+            ),
+          ],
+        ),
       ),
     );
   }
