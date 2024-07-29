@@ -104,6 +104,12 @@ class _HomePageState extends State<HomePage> {
               },
               child: const Text("Simple Notification"),
             ),
+            ElevatedButton(
+              onPressed: () {
+                NotificationServices.instance.scheduledNotification();
+              },
+              child: const Text("Scheduled Notification"),
+            ),
           ],
         ),
       ),

@@ -1,6 +1,8 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class NotificationServices {
   NotificationServices._();
@@ -32,7 +34,10 @@ class NotificationServices {
   Future<void> request() async {
     PermissionStatus status = await Permission.notification.request();
 
-    if (status.isDenied) {
+    PermissionStatus alarmStatus =
+        await Permission.scheduleExactAlarm.request();
+
+    if (status.isDenied && alarmStatus.isDenied) {
       await request();
     }
   }
@@ -67,7 +72,49 @@ class NotificationServices {
         );
   }
 
-  // TODO: scheduledNotification
+  Future<void> scheduledNotification() async {
+    tz.initializeTimeZones();
+
+    AndroidNotificationDetails androidNotificationDetails =
+        const AndroidNotificationDetails(
+      '101',
+      'Demo channel',
+      importance: Importance.max,
+      priority: Priority.max,
+    );
+
+    DarwinNotificationDetails darwinNotificationDetails =
+        const DarwinNotificationDetails();
+
+    NotificationDetails notificationDetails = NotificationDetails(
+      android: androidNotificationDetails,
+      iOS: darwinNotificationDetails,
+    );
+
+    await notificationsPlugin
+        .zonedSchedule(
+          101,
+          "Schedule !!",
+          "This is scheduled notification !!",
+          tz.TZDateTime.from(
+            DateTime.now().add(
+              const Duration(
+                seconds: 2,
+              ),
+            ),
+            tz.local,
+          ),
+          notificationDetails,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+        )
+        .then(
+          (value) => Logger().i("Msg sent..."),
+        )
+        .onError(
+          (error, stackTrace) => Logger().e("NTF ERROR: $error"),
+        );
+  }
 
   // TODO: bigPictureNotification
 

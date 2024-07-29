@@ -8,6 +8,7 @@ import 'package:chat_app_af5/services/firestore_service.dart';
 import 'package:chat_app_af5/services/notification_services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,6 +16,8 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await NotificationServices.instance.initNotification();
+
+  tz.initializeTimeZones();
 
   runApp(
     const MyApp(),
