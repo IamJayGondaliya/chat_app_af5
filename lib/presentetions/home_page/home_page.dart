@@ -110,6 +110,18 @@ class _HomePageState extends State<HomePage> {
               },
               child: const Text("Scheduled Notification"),
             ),
+            ElevatedButton(
+              onPressed: () {
+                NotificationServices.instance.bigPictureNotification();
+              },
+              child: const Text("Big Picture Notification"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                NotificationServices.instance.mediaStyleNotification();
+              },
+              child: const Text("Media Style Notification"),
+            ),
           ],
         ),
       ),

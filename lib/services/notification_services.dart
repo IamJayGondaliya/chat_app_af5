@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 class NotificationServices {
   NotificationServices._();
@@ -81,6 +85,8 @@ class NotificationServices {
       'Demo channel',
       importance: Importance.max,
       priority: Priority.max,
+      playSound: true,
+      sound: RawResourceAndroidNotificationSound("ctdd"),
     );
 
     DarwinNotificationDetails darwinNotificationDetails =
@@ -107,6 +113,7 @@ class NotificationServices {
           notificationDetails,
           uiLocalNotificationDateInterpretation:
               UILocalNotificationDateInterpretation.absoluteTime,
+          matchDateTimeComponents: DateTimeComponents.time,
         )
         .then(
           (value) => Logger().i("Msg sent..."),
@@ -116,7 +123,79 @@ class NotificationServices {
         );
   }
 
-  // TODO: bigPictureNotification
+  Future<void> bigPictureNotification() async {
+    String url =
+        "https://img.freepik.com/free-photo/painting-mountain-lake-with-mountain-background_188544-9126.jpg";
+    http.Response response = await http.get(Uri.parse(url));
 
-  // TODO: mediaStyleNotification
+    Directory directory = await getApplicationSupportDirectory();
+    File path = File("${directory.path}/img.png");
+    path.writeAsBytesSync(response.bodyBytes);
+
+    AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails(
+      '101',
+      'Demo channel',
+      importance: Importance.max,
+      priority: Priority.max,
+      // largeIcon: DrawableResourceAndroidBitmap("ic_launcher"),
+      largeIcon: FilePathAndroidBitmap(path.path),
+      styleInformation: BigPictureStyleInformation(
+        FilePathAndroidBitmap(path.path),
+        hideExpandedLargeIcon: true,
+      ),
+    );
+
+    DarwinNotificationDetails darwinNotificationDetails =
+        const DarwinNotificationDetails();
+
+    NotificationDetails notificationDetails = NotificationDetails(
+      android: androidNotificationDetails,
+      iOS: darwinNotificationDetails,
+    );
+
+    await notificationsPlugin
+        .show(
+          DateTime.now().second,
+          "Hyy there !!",
+          "Notification sent on ${DateTime.now().hour % 12}:${DateTime.now().minute}:${DateTime.now().second}",
+          notificationDetails,
+        )
+        .then((value) => Logger().i("Msg sent..."))
+        .onError(
+          (error, stackTrace) => Logger().e("NTF ERROR: $error"),
+        );
+  }
+
+  Future<void> mediaStyleNotification() async {
+    AndroidNotificationDetails androidNotificationDetails =
+        const AndroidNotificationDetails(
+      '101',
+      'Demo channel',
+      importance: Importance.max,
+      priority: Priority.max,
+      playSound: true,
+      sound: RawResourceAndroidNotificationSound("ctdd"),
+    );
+
+    DarwinNotificationDetails darwinNotificationDetails =
+        const DarwinNotificationDetails();
+
+    NotificationDetails notificationDetails = NotificationDetails(
+      android: androidNotificationDetails,
+      iOS: darwinNotificationDetails,
+    );
+
+    await notificationsPlugin
+        .show(
+          DateTime.now().second,
+          "Hyy there !!",
+          "Notification sent on ${DateTime.now().hour % 12}:${DateTime.now().minute}:${DateTime.now().second}",
+          notificationDetails,
+        )
+        .then((value) => Logger().i("Msg sent..."))
+        .onError(
+          (error, stackTrace) => Logger().e("NTF ERROR: $error"),
+        );
+  }
 }
