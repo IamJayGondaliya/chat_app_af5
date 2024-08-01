@@ -4,6 +4,7 @@ import 'package:chat_app_af5/presentetions/chat_page/chat_page.dart';
 import 'package:chat_app_af5/presentetions/friends/friends.dart';
 import 'package:chat_app_af5/presentetions/home_page/home_page.dart';
 import 'package:chat_app_af5/presentetions/sign_in/sign_in_page.dart';
+import 'package:chat_app_af5/services/fcm_services.dart';
 import 'package:chat_app_af5/services/firestore_service.dart';
 import 'package:chat_app_af5/services/notification_services.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -16,6 +17,8 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await NotificationServices.instance.initNotification();
+
+  await FcmServices.instance.init();
 
   tz.initializeTimeZones();
 
