@@ -8,16 +8,31 @@ import 'package:chat_app_af5/services/fcm_services.dart';
 import 'package:chat_app_af5/services/firestore_service.dart';
 import 'package:chat_app_af5/services/notification_services.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await NotificationServices.instance.initNotification();
 
+  Logger().f("Handling a background message: ${message.messageId}");
+}
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  await NotificationServices.instance.initNotification();
   await FcmServices.instance.init();
 
   tz.initializeTimeZones();

@@ -1,3 +1,4 @@
+import 'package:chat_app_af5/services/notification_services.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:logger/logger.dart';
 
@@ -33,7 +34,10 @@ class FcmServices {
       Logger().i('Message data: ${message.data}');
 
       if (message.notification != null) {
-        print('Message also contained a notification: ${message.notification}');
+        NotificationServices.instance
+            .simpleNotification(title: message.notification?.title ?? "FCM");
+      } else {
+        print('Data: ${message.notification?.title}');
       }
     });
   }

@@ -46,7 +46,7 @@ class NotificationServices {
     }
   }
 
-  Future<void> simpleNotification() async {
+  Future<void> simpleNotification({required String title}) async {
     AndroidNotificationDetails androidNotificationDetails =
         const AndroidNotificationDetails(
       '101',
@@ -66,7 +66,7 @@ class NotificationServices {
     await notificationsPlugin
         .show(
           DateTime.now().second,
-          "Hyy there !!",
+          title,
           "Notification sent on ${DateTime.now().hour % 12}:${DateTime.now().minute}:${DateTime.now().second}",
           notificationDetails,
         )

@@ -100,7 +100,8 @@ class _HomePageState extends State<HomePage> {
           children: [
             ElevatedButton(
               onPressed: () {
-                NotificationServices.instance.simpleNotification();
+                NotificationServices.instance
+                    .simpleNotification(title: "LOCAL");
               },
               child: const Text("Simple Notification"),
             ),
